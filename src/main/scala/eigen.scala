@@ -21,7 +21,7 @@ object Decomposition {
     return I
   }
 
-  def rotation(A: Array[org.apache.spark.mllib.linalg.Vector], i: Int, j:$
+  def rotation(A: Array[org.apache.spark.mllib.linalg.Vector], i: Int, j: Int): Array[org.apache.spark.mllib.linalg.Vector] = {
     var w = (A(j)(j) - A(i)(i))/(2*A(i)(j))
     var t = 0.00
     if(w>=0){
@@ -39,7 +39,7 @@ object Decomposition {
     return R
   }
   
-  def pivot(A: Array[org.apache.spark.mllib.linalg.Vector]): Array[Int] =$
+  def pivot(A: Array[org.apache.spark.mllib.linalg.Vector]): Array[Int] = {
     var i = 0
     var j = 1
     val n = A.size - 1
@@ -54,7 +54,7 @@ object Decomposition {
     return Array(i,j)
   }
 
-  def vectorProd(x: org.apache.spark.mllib.linalg.Vector, B: Array[org.ap$
+  def vectorProd(x: org.apache.spark.mllib.linalg.Vector, B: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): org.apache.spark.mllib.linalg.Vector = {
     val n = x.size - 1
     val m = B(0).size - 1
     var sum = 0.0
@@ -63,11 +63,11 @@ object Decomposition {
     for(i <- 0 to m){
       sum = index.map(j => x(j)*B(j)(i)).reduce(_+_)
       z.toArray(i) = sum
-    }
+    }  
     return z
   }
-
-  def matrixProd(A: Array[org.apache.spark.mllib.linalg.Vector], B: Array$
+    
+  def matrixProd(A: Array[org.apache.spark.mllib.linalg.Vector], B: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): Array[org.apache.spark.mllib.linalg.Vector] = {
     val n = A.size - 1
     val m = B(0).size - 1
     var C = Array[org.apache.spark.mllib.linalg.Vector]()
@@ -90,8 +90,8 @@ object Decomposition {
     }
     return error
   }
-
-  def getEigen(D: Array[org.apache.spark.mllib.linalg.Vector]): Array[Dou$
+  
+  def getEigen(D: Array[org.apache.spark.mllib.linalg.Vector]): Array[Double] = {
     val n = D.size - 1
     var values = Array[Double]()
     var eigenvalues = Array[Double]()
@@ -105,7 +105,8 @@ object Decomposition {
     return eigenvalues
   }
 
-  def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector], sc: Spa$
+
+  def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): Array[Double] = {
     var D = A
     var err = 1.00
     while(err > 0.1){
