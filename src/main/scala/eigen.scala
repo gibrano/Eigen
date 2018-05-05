@@ -77,19 +77,21 @@ object Decomposition {
     }
     return C
   }
-
+  
   def getError(A: Array[org.apache.spark.mllib.linalg.Vector]): Double = {
     val n = A.size - 1
-    var error = math.abs(A(0)(1))
+    var count = 0.00
     for( i <- 0 to (n-1)){
       for(j <- (i+1) to n){
-        if(error < math.abs(A(i)(j))){
-           error = math.abs(A(i)(j))
+        if(math.abs(A(i)(j)) < 0.1){
+           count = count + 1.00
         }
       }
     }
-    return error
+    val total = (A.size*(A.size - 1))/2
+    return count/total
   }
+
   
   def getEigen(D: Array[org.apache.spark.mllib.linalg.Vector]): Array[Double] = {
     val n = D.size - 1
@@ -109,7 +111,7 @@ object Decomposition {
   def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): Array[Double] = {
     var D = A
     var err = 1.00
-    while(err > 0.1){
+    while(err < 0.8){
       var x = pivot(D)
       var R = rotation(D,x(0),x(1))
       var Rt = rotation(D,x(0),x(1))
