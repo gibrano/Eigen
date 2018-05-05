@@ -80,11 +80,11 @@ object Decomposition {
 
   def getError(A: Array[org.apache.spark.mllib.linalg.Vector]): Double = {
     val n = A.size - 1
-    var error = A(0)(1)
+    var error = math.abs(A(0)(1))
     for( i <- 0 to (n-1)){
       for(j <- (i+1) to n){
-        if(error < A(i)(j)){
-           error = A(i)(j)
+        if(error < math.abs(A(i)(j))){
+           error = math.abs(A(i)(j))
         }
       }
     }
