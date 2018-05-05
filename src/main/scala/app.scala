@@ -27,6 +27,7 @@ object Eigen {
 
     val t1 = System.nanoTime
     val eigen = Decomposition.eigenValues(L,sc)
+    println(eigen.mkString(" "))
     val duration = (System.nanoTime - t1) / 1e9d
     print("Duration Time:",duration, "Numbers of Cores", sc.getExecutorStorageStatus.length)
     sc.stop()
