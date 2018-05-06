@@ -65,16 +65,13 @@ object Decomposition {
 
   def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): Array[Double] = {
     var D = A
-    var eigen2 = getEigen(D,sc)
-    var err = 1.00
-    while(err > 0.001){
-      var eigen1 = getEigen(D,sc)
+    var n = A.size*(A.size-1)/2
+    for(iter <- 0 to n){
       var x = pivot(D)
       D = rotate(D, x(0), x(1))
-      eigen2 = getEigen(D,sc)
-      err = getError(eigen1,eigen2,sc)
     }
-    return eigen2
+    var eigen = getEigen(D,sc)
+    return eigen
   }
 
 }
