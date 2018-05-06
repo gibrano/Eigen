@@ -13,9 +13,9 @@ object Eigen {
     val conf = new SparkConf(true).setAppName("Eigen Descomposition")
     val sc = new SparkContext(conf)
     var L = Array[org.apache.spark.mllib.linalg.Vector]()
-    for( i <- 1 to 100){
+    for( i <- 1 to 1000){
       var v = Array[Double]()
-      for( j <- 1 to 100){
+      for( j <- 1 to 1000){
         if(i == j){
            v = v ++ Array(3.00)
         } else{
@@ -24,7 +24,8 @@ object Eigen {
       }
       L = L ++ Array(Vectors.dense(v))
     }
-
+  
+    println("Starting eigen decomposition ...")
     val t1 = System.nanoTime
     val eigen = Decomposition.eigenValues(L,sc)
     println(eigen.mkString(" "))
