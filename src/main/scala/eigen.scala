@@ -33,44 +33,44 @@ object Decomposition {
     return A
   }
   
-  def pivot(A: Array[org.apache.spark.mllib.linalg.Vector]): Array[Int] = {
+  def pivot(A: Array[org.apache.spark.mllib.linalg.Vector]): (Array[Int], Double) = {
     var i = 0
     var j = 1
+    var max = A(i)(j)
     val n = A.size - 1
     for( k1 <- 0 to (n-1)){
-      for(k2 <- (k1+1) to n){
-        if(math.abs(A(i)(j)) < math.abs(A(k1)(k2))){
+      for( k2 <- (k1+1) to n){
+        if(max < math.abs(A(k1)(k2))){
            i = k1
            j = k2
+           max = math.abs(A(k1)(k2))
         }
       }
     }
-    return Array(i,j)
+    return (Array(i,j),max)
   }
 
-  def getError(x1: Array[Double], x2: Array[Double], sc: SparkContext): Double = {
-    val n = x1.size - 1
-    var index = sc.parallelize(0 to n)
-    var diff = index.map(i => math.abs(x2(i) - x1(i)))
-    var err = diff.max
-    return err
-  }
-
-  def getEigen(D: Array[org.apache.spark.mllib.linalg.Vector],  sc: SparkContext): Array[Double] = {
+  def getEigen(D: Array[org.apache.spark.mllib.linalg.Vector]): Array[Double] = {
     val n = D.size - 1
-    var index = sc.parallelize(0 to n)
-    var eigenvalues = index.map(i => D(i)(i)).collect
+    var eigenvalues = Array[Double]()
+    for(i <- 0 to n){
+      eigenvalues = eigenvalues ++ Array(D(i)(i))
+    }
     return eigenvalues
   }
 
-  def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector], sc: SparkContext): Array[Double] = {
+  def eigenValues(A: Array[org.apache.spark.mllib.linalg.Vector]): Array[Double] = {
     var D = A
-    var n = A.size*(A.size-1)/2
-    for(iter <- 0 to n){
+    var n = A.size
+    var iter = 0
+    var max = 1.00
+    while(iter < n && max > 0.1){
       var x = pivot(D)
-      D = rotate(D, x(0), x(1))
+      D = rotate(D, x._1(0), x._1(1))
+      max = x._2
+      iter = iter + 1
     }
-    var eigen = getEigen(D,sc)
+    var eigen = getEigen(D)
     return eigen
   }
 
